@@ -1,0 +1,26 @@
+"-- Sin embargo --dije--, cuando leísteis las huellas en la nieve y en las ramas aún no conocías a Brunello. 
+En cierto modo, esas huellas nos hablaban de todos los caballos, o al menos de todos los caballos de aquella especie.
+¿No deberíamos decir, entonces, que el libro de la naturaleza nos habla sólo por esencias, como enseñan muchos teólogos insignes?
+
+-- No exactamente, querido Adso --respondió el maestro-- 
+Sin duda, aquel tipo de impronta me hablaba, si quieres, del caballo como verbum mentis, 
+y me hubiese hablado de él en cualquier sitio donde la encontrara. 
+Pero la impronta en aquel lugar y en aquel momento del día me decía que al menos 
+uno de todos los caballos posibles había pasado por allí. 
+¨De modo que me encontraba a mitad de camino entre la aprehensión del concepto de caballo 
+y el conocimiento de un caballo individual. Y, de todas maneras, lo conocía del caballo universal 
+procedía de la huella, que era singular. Podría decir que en aquel momento estaba estaba preso 
+entre la singularidad de la huella y mi ignorancia, que adoptaba la forma bastante diáfana de una idea universal. 
+Si ves algo de lejos, sin comprender de qué se trata, te contentarás con definirlo como un cuerpo extenso. 
+Cuando estés un poco más cerca, lo definirás como un animal, aunque todavía no sepas si se trata de un caballo o un asno. 
+Si te sigues acercando, podrás decir que es un caballo, aunque aún no sepas si se trata de Brunello o de Favello. 
+Por último, sólo cuando estés a la distancia adecuada verás que es Brunello, o bien, ese caballo y no otro, 
+cualquiera que sea el nombre que quieras darle. 
+Este será el conocimiento pleno, la intuición de lo singular. [...] 
+De modo que las ideas, que antes había utilizado para imaginar un caballo que aún no había visto, 
+eran puros signos, como eran signos de la idea de caballo las huellas sobre la nieve; 
+cuando no poseemos las cosas, usamos signos y signos de signos."
+
+Umberto Eco, El nombre de la rosa, Primer día: Tercia.
+
+Debe realizar el diagrama de clases del texto citado. Encontrar los conceptos, las clases y sus respectivas instancias.
