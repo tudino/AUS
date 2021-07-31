@@ -39,12 +39,12 @@ int main () {
     cache_manager.insert("a", Something(1,2));
     cache_manager.insert("b", Something(2,2));
     cache_manager.insert("c", Something(3,3));
-    // cache_manager.insert("d", Something(4,4));
-    // cache_manager.insert("e", Something(5,5));
-    // cache_manager.insert("a", Something(6,6));
-    // cache_manager.insert("e", Something(7,7));
-    // cache_manager.insert("b", Something(8,8));
-    // cache_manager.insert("c", cache_manager.get("a"));
+    cache_manager.insert("d", Something(4,4));
+    cache_manager.insert("e", Something(5,5));
+    cache_manager.insert("a", Something(6,6));
+    cache_manager.insert("e", Something(7,7));
+    cache_manager.insert("b", Something(8,8));
+    cache_manager.insert("c", cache_manager.get("a"));
     
     return 0;
 }

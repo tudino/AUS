@@ -2,16 +2,20 @@
 #include "cache.h"
 
 /**
- * 
+ * Constructor CacheManager
+ * Inicializa la capacidad de la cache y llama a contar los elementos almacenados en el archivo
+ * @int cap => Capacidad de la memoria cache
  */
 template <class T>
 CacheManager<T>::CacheManager(int cap) {
     this->capacity = cap;
-    this->set_file_size();
+    this->calc_file_size();
 }
 
 /**
- * 
+ * If exists
+ * Retorna true si el archivo existe
+ * @string name => Nombre del archivo
  */
 template <class T>
 bool CacheManager<T>::if_exists(string name) {
@@ -20,24 +24,26 @@ bool CacheManager<T>::if_exists(string name) {
 }
 
 /**
- * 
+ * Is empty
+ * Retorna true si el archivo esta vacio
+ * @ifstream filep => instancia ifstream
  */
 template <class T>
-bool CacheManager<T>::is_empty(std::ifstream& pFile)
+bool CacheManager<T>::is_empty(ifstream& filep)
 {
-    return pFile.peek() == std::ifstream::traits_type::eof();
+    return filep.peek() == ifstream::traits_type::eof();
 }
 
 /**
- * Set file size
+ * Calc file size
  * Establece la cantidad de objetos presentes en el archivo.
  * ej. file_size = 47 
  * ej. file_size/max_size = 47/100
  */
 template <class T>
-bool CacheManager<T>::set_file_size() {
+int CacheManager<T>::calc_file_size() {
     cout << "----------------------------------" << endl;
-    cout << "Calculando taman~o del archivo ... " << endl;
+    cout << "Calculando taman~o del archivo file.cache ... " << endl;
     int w = 0;
     string temp_k;
     T temp_v;
@@ -48,12 +54,9 @@ bool CacheManager<T>::set_file_size() {
             cout << "ARCHIVO VACIO" << endl;
         } else {
             ifs.seekg(0, ios::beg);
-            // int sizeof_row = sizeof(temp_k) + sizeof(temp_v);    // Calcula el tamaño
-
+            cout << "Leyendo elementos ... " << endl;
             while (ifs >> temp_k >> temp_v && w <= this->get_max_file_size()) {
-                // ifs.seekg(sizeof_row * w, ios::beg);
-                // ifs >> temp_k >> temp_v;
-                cout << "temp_k: " << temp_k << " | temp_v: "  << temp_v << endl;
+                cout << "    :: " << temp_k << " => "  << temp_v << endl;
                 w++;
             }
         }
@@ -61,8 +64,9 @@ bool CacheManager<T>::set_file_size() {
     ifs.close();
     this->file_size = w;
     
-    cout << "File size: " << w << endl;
+    cout << "Cantidad de elementos en el archivo (File size): " << w << endl;
     cout << "----------------------------------" << endl;
+    return w;
 }
 
 /**
@@ -72,13 +76,14 @@ bool CacheManager<T>::set_file_size() {
  */
 template <class T>
 int CacheManager<T>::get_file_size() {
-    return this->file_size;
+    return this->calc_file_size();
 }
 
 /**
  * Set max file size
  * Establece la cantidad máxima de objetos que puede almacenar el archivo
  * ej. max_size = 100 
+ * @int s => Cantidad maxima de elementos que puede almacenar el archivo
  */
 template <class T>
 bool CacheManager<T>::set_max_file_size(int s) {
@@ -97,75 +102,69 @@ int CacheManager<T>::get_max_file_size() {
 
 
 /**
- * 
+ * Write file
+ * Agrega nuevos elementos al archivo y actualiza los existentes respetando el taman~o maximo establecido
+ * @string key => Clave del objeto
+ * @T obj => Objeto a almacenar en el archivo
  */
 template <class T>
 bool CacheManager<T>::write_file(string key, T obj) {
     try
     {
         if (this->if_exists(CACHE_FILE_DIR)) {
-            this->set_file_size();
-
-            cout << "------------------" << endl;
-            cout << "Key: " << key << " Obj: " << obj << endl;
-            cout << "------------------" << endl;
-            int w = 0;
-            int sizeof_row = sizeof(key) + sizeof(" ") + sizeof(obj);    // Calcula el tamaño
-            string temp_k;                                  // Variable temporal para almacenar la clave
-            T temp_v;                                       // Variable temporal para almacenar el objeto
-            this->file_objects = {};                        // Inicializo vector temporal para almacenar los objetos del archivo
-            pair<string, T> file_row = {};                  // Inicializo par temporal para almacenar la clave y el objeto
-            bool is_updated = false;                        // Bandera para indicar si el archivo fue actualizado
-            ifstream ifs;                                   // Declara file stream para lectura
-            ifs.open(CACHE_FILE_DIR, ios::in | ios::binary);                    // Abre file stream
+            cout << "--------------------" << endl;
+            cout << "Recibe elemento a escribir en file.cache ... " << endl;
+            cout << "    :: " << key << " => " << obj << endl;
+            cout << "--------------------" << endl;
             
-            ofstream ofs;                                   // Declara file stream para escritura
+            this->calc_file_size();              // Actualiza la variable con el valor actual de la cantidad de objetos en el archivo
+   
+            int w = 0;                          // Inicializa el contador para recorrer el archivo
+            string temp_k;                      // Variable temporal para almacenar la clave
+            T temp_v;                           // Variable temporal para almacenar el objeto
+            this->file_objects = {};            // Inicializo vector temporal para almacenar los objetos del archivo
+            pair<string, T> file_row = {};      // Inicializo par temporal para almacenar la clave y el objeto
+            bool is_updated = false;            // Bandera para indicar si el archivo fue actualizado
+            ifstream ifs;                       // Declara file stream para lectura
+            ofstream ofs;                       // Declara file stream para escritura
 
-            if (ifs.is_open() && !is_empty(ifs)) {
-                ifs.seekg(0, ios::beg);
-                while (ifs >> temp_k >> temp_v) {          // Recorre hasta fin de archivo y hasta no superar el tamaño maximo
-                    if (temp_k == key && w <= this->get_max_file_size()) {
-                        // cout << "DEBUG - Linea 119 -" << "seekp" << sizeof_row * w << endl;
-                        // ofs.open(CACHE_FILE_DIR, ios::trunc | ios::binary);      // Abre file stream
-                        // if (ofs.is_open() && (this->get_file_size() <= this->get_max_file_size())) {
-                        //     // ofs.seekp((sizeof_row * w) + sizeof(key) + sizeof(" "), ios::beg);
-                        //     // ofs << key << " " << obj << endl;
-                        //     ofs.write( (char *) & obj, sizeof(obj));
-                        //     ofs.close();
-                        //     cout << "Actualiza: " << key << " " << obj << endl;
-                        //     // return true;
-                        // }
-                        temp_v = obj;
-                        cout << "Actualiza: " << key << " " << obj << endl;
-                        is_updated = true;
+            ifs.open(CACHE_FILE_DIR, ios::in | ios::binary);                // Abre file stream
+            if (ifs.is_open() && !is_empty(ifs)) {                          // Continua si el archivo esta abierto y no esta vacio
+                ifs.seekg(0, ios::beg);                                     // Setea indice en 0            
+                while (ifs >> temp_k >> temp_v) {                           // Recorre hasta fin de archivo y hasta no superar el tamaño maximo
+                    if (temp_k == key && w <= this->get_max_file_size()) {  // Cuando la clave del archivo coincide con la clave a insertar
+                        temp_v = obj;                                       // Almacena temporalmente el objeto    
+                        cout << "Actualiza: " << key << " " << obj << endl; // Muestra en pantalla
+                        is_updated = true;                          // Establece que hubo coincidencia y se actualizara
                     }
-                    file_row = {temp_k, temp_v};
-                    file_objects.push_back(file_row);
-                    w++;
+                    file_row = {temp_k, temp_v};                    // Asigna los valores extraidos del archivo con y sin modificaciones
+                    file_objects.push_back(file_row);               // Guarda temporalmente la linea en el vector temporal
+                    w++;                                            // Incrementa el contador
                 }
 
                 ofs.open(CACHE_FILE_DIR, ios::out | ios::binary);   // Abre file stream para sobreescribir el archivo con el dato actualizado
-                ofs.seekp(0, ios::end);
-                for(const auto& ob : file_objects) {
-                    ofs << ob.first << " " << ob.second << endl;
+                ofs.seekp(0, ios::end);                             // Setea indice en 0            
+                for(const auto& ob : file_objects) {                // Recorre el vector temporal de par <clave, objeto>
+                    ofs << ob.first << " " << ob.second << endl;    // Escribe cada objeto en una linea
                 }
-                ofs.close();
-                if (is_updated) {
-                    return true;
+                ofs.close();                                        // Cierra el stream
+                if (is_updated) {                                   
+                    return true;                                    // Retorna cuando una linea ha sido actualizada
                 }
             }
-            ifs.close();
+            ifs.close();                                            // Cierra stream
 
-            ofs.open(CACHE_FILE_DIR, ios::app | ios::binary);      // Abre file stream
+            ofs.open(CACHE_FILE_DIR, ios::app | ios::binary);       // Abre file stream
             if (ofs.is_open()) {
                 cout << "------------------" << endl;
                 cout << "Current file size: " << this->get_file_size() << " | Current max size: " << this->get_max_file_size() << endl;
                 cout << "------------------" << endl;
-                if (this->get_file_size() < this->get_max_file_size()) {
-                    ofs.seekp(0, ios::end);
-                    ofs << key << " " << obj << endl;
-                    ofs.close();
-                    cout << "Inserta: " << key << " " << obj << endl;
+                if (this->get_file_size() < this->get_max_file_size()) {    // Si el taman~o del archivo no supera la capacidad maxima
+                    ofs.seekp(0, ios::end);                                 // Setea indice en 0
+                    ofs << key << " " << obj << endl;                       // Agrega un objeto al final del archivo
+                    ofs.close();                                            // Cierra stream
+                    cout << "Inserta: " << key << " " << obj << endl;       // Muestra en pantalla
+                    return true;                                            // Retorna cuando una linea ha sido insertada
                 } else {
                     cerr << "No se puede insertar el objeto => " << key << " " << obj << endl;
                     cerr << "El archivo ha llegado a su capacidad maxima." << endl;
@@ -185,16 +184,22 @@ bool CacheManager<T>::write_file(string key, T obj) {
 
 /**
  * Insert
+ * Agrega nuevos elementos al archivo y actualiza los existentes respetando el taman~o maximo establecido
+ * @string key => Clave del objeto
+ * @T obj => Objeto a almacenar en el archivo
  */
 template <class T>
 void CacheManager<T>::insert(string key, T obj) {
     try
     {
-        // Escribe en archivo
-        this->write_file(key, obj);
+        // Escribe linea en el archivo
+        bool wrote = this->write_file(key, obj);
         
-        // Actualiza la cache, reemplazando el LFU
-
+        // Si wrote = true => la linea se inserto correctamente
+        // Procede a actualizar la memoria cache
+        if (wrote) {
+            // Actualiza la cache, reemplazando el LFU
+        }
     }
     catch(const std::exception& e)
     {
@@ -203,14 +208,57 @@ void CacheManager<T>::insert(string key, T obj) {
 }
 
 /**
- * 
+ * Get element by key
+ * Busca y retorna un objeto a partir de la clave
+ * @string key 
  */
 template <class T>
 T CacheManager<T>::get(string key) {
     try
     {
+        T obj;
+
+        // obj = this->find_in_cache(key);
+        // return obj;
+
+        obj = this->find_in_file(key);
+        return obj;
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+}
+
+/**
+ * Find in file
+ * Busca y retorna un objeto del archivo a partir de la clave
+ * @string key 
+ */
+template <class T>
+T CacheManager<T>::find_in_cache(string key) {
+    try
+    {
+        // Code
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+}
+
+/**
+ * Find in file
+ * Busca y retorna un objeto del archivo a partir de la clave
+ * @string key 
+ */
+template <class T>
+T CacheManager<T>::find_in_file(string key) {
+    try
+    {
         if (this->if_exists(CACHE_FILE_DIR)) {
-            // Bandera activa cuando se encuentra la clave
+            cout << "--------------------" << endl;
+            cout << "Buscando elemento en archivo .. " << endl;
 
             string temp_k;
             T temp_v;
@@ -225,8 +273,9 @@ T CacheManager<T>::get(string key) {
                     cache_file >> temp_k >> temp_v;
 
                     if (temp_k == key) {
-                        cout << "Clave: ";
-                        cout << temp_k << " " << temp_v << endl;
+                        cout << "Elemento obtenido: :: " << temp_k << " => ";
+                        cout << temp_v << endl;
+                        cout << "--------------------" << endl;
                         
                         return temp_v; 
                     }
@@ -236,9 +285,12 @@ T CacheManager<T>::get(string key) {
                 
             }
             cerr << "Clave: " << key  << " no encontrada." << endl;
+            cout << "--------------------" << endl;
             cache_file.close();
+            exit(1);
         } else {
             cerr << "El archivo file.cache no existe." << endl;
+            exit(1);
         }
     }
     catch(const std::exception& e)
@@ -246,6 +298,7 @@ T CacheManager<T>::get(string key) {
         std::cerr << e.what() << '\n';
     }
 }
+
 
 /**
  * 
