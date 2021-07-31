@@ -36,15 +36,18 @@ int main () {
     CacheManager<Something> cache_manager(3);
     cache_manager.set_max_file_size(5);
 
-    cache_manager.insert("a", Something(1,2));
-    cache_manager.insert("b", Something(2,2));
-    cache_manager.insert("c", Something(3,3));
-    // cache_manager.insert("d", Something(4,4));
-    // cache_manager.insert("e", Something(5,5));
-    // cache_manager.insert("a", Something(6,6));
-    // cache_manager.insert("e", Something(7,7));
-    // cache_manager.insert("b", Something(8,8));
-    // cache_manager.insert("c", cache_manager.get("a"));
+    Something s1(0,0);
+    
+    cache_manager.insert("a", s1);
+    cache_manager.insert("b", Something(4,4));
+    cache_manager.insert("c", Something(0,0));
+    cache_manager.insert("d", Something(2,2));
+    cache_manager.insert("e", Something(0,0));
+    cache_manager.insert("a", Something(0,0));
+    cache_manager.insert("e", Something(0,0));
+    cache_manager.insert("b", Something(0,0));
+    cache_manager.insert("f", Something(0,0));
+    cache_manager.insert("g", Something(0,0));
     
     return 0;
 }
