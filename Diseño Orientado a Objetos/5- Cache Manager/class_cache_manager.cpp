@@ -1,4 +1,5 @@
 #include <typeinfo>
+#include <stdexcept>
 #include "cache.h"
 
 /**
@@ -42,6 +43,10 @@ bool CacheManager<T>::is_empty(ifstream& filep)
  */
 template <class T>
 int CacheManager<T>::calc_file_size() {
+    if (!this->if_exists(CACHE_FILE_DIR)) {
+        ofstream new_file(CACHE_FILE_DIR);
+    }
+
     cout << "----------------------------------" << endl;
     cout << "Calculando taman~o del archivo file.cache ... " << endl;
     int w = 0;
@@ -173,6 +178,7 @@ bool CacheManager<T>::write_file(string key, T obj) {
             ofs.close();
         } else {
             cerr << "El archivo file.cache no existe." << endl;
+            exit(-1);
         }
         return false;
     }
@@ -199,6 +205,7 @@ void CacheManager<T>::insert(string key, T obj) {
         // Procede a actualizar la memoria cache
         if (wrote) {
             // Actualiza la cache, reemplazando el LFU
+            this->write_cache(key, obj);
         }
     }
     catch(const std::exception& e)
@@ -218,11 +225,59 @@ T CacheManager<T>::get(string key) {
     {
         T obj;
 
-        // obj = this->find_in_cache(key);
-        // return obj;
+        cout << "--------------------" << endl;
+        cout << "Buscando elemento en cache :: " << key << endl;
+        cout << "--------------------" << endl;
+        for(const auto& row : this->cache_data) {           // Recorre el map [map<string, pair<T, int>> cache_data]
+            if (row.first == key) {                         // La fila coincide con la clave
+                this->mru = this->mru + 1;                  // Incrementa el indice MRU
+                this->cache_data[row.first].second = this->mru; 
+                cout << "Elemento obtenido de cache: :: " << row.first << " => ";
+                cout << row.second.first << endl;
+                cout << "--------------------" << endl;
+                return row.second.first;                    // Retorna el objeto T del map
+            }
+        }
 
-        obj = this->find_in_file(key);
-        return obj;
+        cout << "Elemento no encontrado en cache :: " << key << endl;
+
+        // Si llega hasta aca es porque no se encuentra en cache
+        // Busca en archivo
+        if (this->if_exists(CACHE_FILE_DIR)) {
+            cout << "--------------------" << endl;
+            cout << "Buscando elemento en archivo :: " << key << endl;
+
+            string temp_k;
+            T temp_v;
+
+            fstream cache_file;
+            cache_file.open(CACHE_FILE_DIR, ios::in | ios::app | ios::binary);
+            
+            if (cache_file.is_open()) {
+                cache_file.seekg(0, ios::beg);
+                int i = this->get_file_size();
+                while (i > 0) {
+                    cache_file >> temp_k >> temp_v;
+                    if (temp_k == key) {
+                        cout << "Elemento obtenido: :: " << temp_k << " => ";
+                        cout << temp_v << endl;
+                        cout << "--------------------" << endl;
+                        if (this->write_cache(key, temp_v)) {
+                            return temp_v;
+                        }
+                    }
+                    i--;
+                }
+                
+            }
+            cerr << "Clave: " << key  << " no encontrada." << endl;
+            cout << "--------------------" << endl;
+            cache_file.close();
+            return obj;
+        } else {
+            cerr << "El archivo file.cache no existe." << endl;
+            exit(1);
+        }
     }
     catch(const std::exception& e)
     {
@@ -231,15 +286,83 @@ T CacheManager<T>::get(string key) {
 }
 
 /**
- * Find in file
- * Busca y retorna un objeto del archivo a partir de la clave
+ * Find in cache
+ * Busca y retorna un objeto de la cache a partir de la clave
  * @string key 
  */
 template <class T>
-T CacheManager<T>::find_in_cache(string key) {
+bool CacheManager<T>::write_cache(string key, T obj) {
     try
     {
-        // Code
+        string lru_elem = key;
+        int lru_val = 99999;
+        int c = 0;
+        for(const auto& row : this->cache_data) {           // Recorre el map [map<string, pair<T, int>> cache_data]
+            if (row.first == key) {                         // La fila coincide con la clave
+                this->mru = this->mru + 1;                  // Incrementa el indice MRU
+                this->cache_data.insert({key, {obj, this->mru}}); 
+
+                cout << "Elemento guardado en cache: :: " << key << " => ";
+                cout << obj << endl;
+                cout << "--------------------" << endl;
+                return true;
+            }
+            if (c < this->capacity && row.second.second < lru_val) {
+                lru_elem = row.first;
+                lru_val = row.second.second;
+            }
+            c++;
+        }
+        
+        try {
+            if (c >= this->capacity) {
+                this->cache_data.erase(lru_elem); 
+                this->mru = this->mru + 1;                          // Incrementa el indice MRU
+                this->cache_data.insert({key, {obj, this->mru}}); 
+                cout << "Elemento guardado en cache: :: " << key << " => ";
+                cout << obj << endl;
+                cout << "--------------------" << endl;
+                return true;
+            } else {
+                this->mru = this->mru + 1;                          // Incrementa el indice MRU
+                this->cache_data.insert({key, {obj, this->mru}}); 
+                cout << "Elemento guardado en cache: :: " << key << " => ";
+                cout << obj << endl;
+                cout << "--------------------" << endl;
+                return true;
+            }
+        } catch (const std::runtime_error& e) {
+            throw e;
+        }
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+}
+
+/**
+ * Find in cache
+ * Busca y retorna un objeto de la cache a partir de la clave
+ * @string key 
+ */
+template <class T>
+void CacheManager<T>::read_cache() {
+    try
+    {
+        int c = 0;
+        cout << "--------------------" << endl;
+        cout << "Imprimiendo cache ... " << endl;
+        for(const auto& row : this->cache_data) {           // Recorre el map [map<string, pair<T, int>> cache_data]
+            cout << "Clave :: " << row.first;
+            cout << " => " << row.second.first;
+            cout << " | MRU = " << row.second.second << endl;
+            c++;
+        }
+        if (c == 0) {
+            cout << "Cache vacia" << endl;
+        }
+        cout << "--------------------" << endl;
     }
     catch(const std::exception& e)
     {
@@ -256,42 +379,7 @@ template <class T>
 T CacheManager<T>::find_in_file(string key) {
     try
     {
-        if (this->if_exists(CACHE_FILE_DIR)) {
-            cout << "--------------------" << endl;
-            cout << "Buscando elemento en archivo .. " << endl;
-
-            string temp_k;
-            T temp_v;
-
-            fstream cache_file;
-            cache_file.open(CACHE_FILE_DIR, ios::in | ios::app | ios::binary);
-            
-            if (cache_file.is_open()) {
-                cache_file.seekg(0, ios::beg);
-                int i = this->get_file_size();
-                while (i > 0) {
-                    cache_file >> temp_k >> temp_v;
-
-                    if (temp_k == key) {
-                        cout << "Elemento obtenido: :: " << temp_k << " => ";
-                        cout << temp_v << endl;
-                        cout << "--------------------" << endl;
-                        
-                        return temp_v; 
-                    }
-                    
-                    i--;
-                }
-                
-            }
-            cerr << "Clave: " << key  << " no encontrada." << endl;
-            cout << "--------------------" << endl;
-            cache_file.close();
-            exit(1);
-        } else {
-            cerr << "El archivo file.cache no existe." << endl;
-            exit(1);
-        }
+        //
     }
     catch(const std::exception& e)
     {
@@ -305,5 +393,8 @@ T CacheManager<T>::find_in_file(string key) {
  */
 template <class T>
 void CacheManager<T>::print() {
-    cout << this->capacity << endl;
+    cout << "Capacidad actual del archivo: " << this->get_file_size() << endl;
+    cout << "Capacidad maxima del archivo: " << this->get_max_file_size() << endl;
+    cout << "Capacidad de la cache: " << this->capacity << endl;
+    this->read_cache();
 }
