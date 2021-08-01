@@ -36,7 +36,7 @@ public:
 
     void insert(string, T);             // Inserta un objeto con su clave
     T get(string);                      // Retorna el objeto ingresando su clave
-    void read_cache();
+    void read_cache();                  // Imprime en pantalla los datos almacenados en cache
     
     void print();                       // Muestra el estado actual de la cache en pantalla
     bool set_max_file_size(int);        // Establece la cantidad maxima de objetos que puede almacenar el archivo

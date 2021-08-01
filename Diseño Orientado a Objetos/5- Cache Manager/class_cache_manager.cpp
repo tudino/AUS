@@ -286,9 +286,10 @@ T CacheManager<T>::get(string key) {
 }
 
 /**
- * Find in cache
- * Busca y retorna un objeto de la cache a partir de la clave
- * @string key 
+ * Write cache
+ * Escribe un objeto en la cache
+ * @string key => Clave del objeto
+ * @T obj => Objeto a almacenar en el archivo
  */
 template <class T>
 bool CacheManager<T>::write_cache(string key, T obj) {
@@ -342,9 +343,8 @@ bool CacheManager<T>::write_cache(string key, T obj) {
 }
 
 /**
- * Find in cache
- * Busca y retorna un objeto de la cache a partir de la clave
- * @string key 
+ * Read cache
+ * Imprime los datos de la cache en pantalla
  */
 template <class T>
 void CacheManager<T>::read_cache() {
@@ -371,7 +371,8 @@ void CacheManager<T>::read_cache() {
 }
 
 /**
- * 
+ * Print
+ * Imprime los datos principales del CacheManager
  */
 template <class T>
 void CacheManager<T>::print() {
