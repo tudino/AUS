@@ -10,13 +10,6 @@
 
 using namespace std;
 
-  
-/**
-* 
-*/
-// template <typename U, typename T>
-// using file_row = pair<U, T>;
-
 /**
  * Cache Manager
  * Template class T
@@ -50,23 +43,3 @@ public:
     int get_max_file_size();            // Retorna la cantidad maxima de objetos que puede almacenar el archivo
     int get_file_size();                // Retorna la cantidad de objetos presentes en el archivo
 };
-
-
-/**
-* Class MayorIndice
-* Criterio para ordenar la cola de prioridades
-*/
-// template <class T>
-// class MayorIndice {
-// public:
-//     bool operator() (T e1, T e2) {
-//         return e1.second > e2.second;
-//     }
-// };
-
-/**
-* Tipo cache
-* Cola de prioridad de elementos en cache ordenada de mayor a menor segun indice de uso
-*/
-// template <class T>
-// typedef priority_queue<T, vector<T>, MayorIndice> cache;
