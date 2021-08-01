@@ -43,8 +43,6 @@ public:
 
     void insert(string, T);             // Inserta un objeto con su clave
     T get(string);                      // Retorna el objeto ingresando su clave
-    T find_in_file(string);             // Busca y retorna el objeto del archivo ingresando su clave. Asiste a la funcion CacheManager::get()
-    // T find_in_cache(string);            // Busca y retorna el objeto de la cache ingresando su clave. Asiste a la funcion CacheManager::get()
     void read_cache();
     
     void print();                       // Muestra el estado actual de la cache en pantalla

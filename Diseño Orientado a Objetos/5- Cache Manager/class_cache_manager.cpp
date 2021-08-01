@@ -371,24 +371,6 @@ void CacheManager<T>::read_cache() {
 }
 
 /**
- * Find in file
- * Busca y retorna un objeto del archivo a partir de la clave
- * @string key 
- */
-template <class T>
-T CacheManager<T>::find_in_file(string key) {
-    try
-    {
-        //
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-}
-
-
-/**
  * 
  */
 template <class T>
