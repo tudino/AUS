@@ -6,6 +6,7 @@ public class Punto {
         x = x0;
         y = y0;
     }
+
     // public Punto() {}
 
     public void print() {
