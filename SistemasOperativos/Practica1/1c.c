@@ -69,6 +69,7 @@ int main() {
     int end = 0;
     int EXIT = 1111;
 
+    printf("To exit press %d \n", EXIT);
     do {
         printf("Enter a number => ");
         scanf("%d", &input);
