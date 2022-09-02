@@ -34,6 +34,17 @@ void qqsort(unsigned int *arr, int size) {
     order(arr, size, 0, size - 1);
 }
 
+void print_arr(unsigned int *arr, int size) {
+    int i = 0;
+    for (i = 0; i < size; i++) {
+        if (i < size - 1) {
+            printf("%d, ", arr[i]);
+        } else {
+            printf("%d \n", arr[i]);
+        }
+    }
+}
+
 int main() {
     unsigned int *arr = (unsigned int*)malloc(sizeof(int)*100);
 
@@ -55,13 +66,5 @@ int main() {
     } while(end != 1);
 
     qqsort(arr, counter);
-
-    int j = 0;
-    for (j = 0; j < counter; j++) {
-        if (j < counter - 1) {
-            printf("%d, ", arr[j]);
-        } else {
-            printf("%d \n", arr[j]);
-        }
-    }
+    print_arr(arr, counter);
 }
