@@ -3,25 +3,8 @@
 #include <math.h>
 #include <errno.h>
 
-int* bbsearch(int key, int *arr, int size) {
-    int low = 0;
-    int high = size;
-    int mid;
-
-    do {
-        mid = (int)(low + (high - low) / 2);
-
-        if (key == arr[mid]) {
-            return mid + 1;
-        };
-        if (key < arr[mid]) {
-            high = mid - 1;
-        } else {
-            low = mid + 1;
-        }
-    } while (low <= high);
-
-    return NULL;
+int order_asc(void * a, void * b) {
+   return ( *(int*)a - *(int*)b );
 }
 
 int main() {
@@ -50,11 +33,11 @@ int main() {
     printf("Enter key to search => ");
     scanf("%d", &key);
 
-    item = (int*) bbsearch(key, arr, counter);
+    item = (int*) bsearch(&key, arr, counter, sizeof(input), order_asc);
     
     if (item == NULL) {
         printf("Item %d not found in array \n", key);
     } else {
-        printf("Key found in position [ %d ] \n", (int*)item);
+        printf("Key found in position [ %d ]  \n", *item);
     }
 }
