@@ -1,3 +1,5 @@
+/* my_cat */
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
