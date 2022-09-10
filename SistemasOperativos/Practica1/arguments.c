@@ -7,7 +7,7 @@ int main (int argc, char** argv) {
 
     // read <char** argv>
     printf("Arguments: \n");
-    for (int i = 0; i < sizeof(argv) / sizeof(*argv[0]); i++) {
+    for (int i = 0; i < argc; i++) {
         printf("Argument = %s \n", argv[i]);
     }
     return 0;
