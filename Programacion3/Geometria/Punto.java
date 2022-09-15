@@ -1,3 +1,4 @@
+package Geometria;
 public class Punto {
     private int x = 0;
     private int y = 0;
