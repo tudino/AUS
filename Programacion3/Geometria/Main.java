@@ -1,10 +1,16 @@
 package Geometria;
+
 public class Main {
     
     public static void main(String[] args) {
-        Punto punto = new Punto(20,10);
+        Punto p1 = new Punto(10,10);
 
-        punto.print();
+        Punto p3 = new Punto3D(10, 10, 10);
+
+        p1.print();
+        System.out.println(p1.distanceToOrigin());
+        p3.print();
+        System.out.println(p3.distanceToOrigin());
         
     }
 }
