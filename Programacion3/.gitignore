@@ -1,3 +1,5 @@
 /QuickStart.class
 /Test.class
 *.class
+.classpath
+.project 
