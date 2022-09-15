@@ -1,5 +1,6 @@
-public class Juego {
+package JuegoDeCartas;
 
+public class Juego {
 	public static void main(String [] args) {
 		
 		Mazo miMazo = new Mazo();

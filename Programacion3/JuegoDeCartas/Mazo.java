@@ -1,3 +1,5 @@
+package JuegoDeCartas;
+
 public class Mazo {
 	
 	private int cant;

@@ -1,3 +1,5 @@
+package JuegoDeCartas;
+
 public class Carta {
 	
 	public final Palo palo;
