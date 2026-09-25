@@ -1,0 +1,8 @@
+Práctica Programas Interactivos:
+
+Ahora a las modificaciones que ya hicimos del juego del ahorcado le tendrás que agregar las siguientes:
+
+A) Posibilitar jugar de a 2 jugadores por turnos: Cada jugador elegirá 2 palabra secreta para su oponente e ingresará su nombre. Se deberá identificar a cada jugador por su nombre indicando quien tiene que jugar en cada turno. Cada oponente tendrá que resolver 2 palabras para completar el juego.
+
+B) Puntaje por jugador, se deberá mostrar en cada momento el puntaje y los intentos restantes que tiene cada jugador: Se dispones de 8 fallos por palabra. Si se alcanza el máximo de fallos se pasa a la palabra siguiente. El puntaje se calcula de la siguiente manera: cada letra acertada suma 1 punto. Palabra resuelta suma 50 puntos y -3 puntos por fallo y (-25) por palabra perdida
+
