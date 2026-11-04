@@ -37,7 +37,8 @@ public class HiloBuscador implements Runnable {
                 File archivo = elementos[i];
 
                 if (archivo.isFile() && archivo.getName().equals(this.nombreArchivo)) {
-                    System.out.println(archivo.getPath() + " - " + Thread.currentThread().getName());
+                    System.out.println(Thread.currentThread().getName());
+                	System.out.println(archivo.getAbsolutePath());
                 }
             }
         }

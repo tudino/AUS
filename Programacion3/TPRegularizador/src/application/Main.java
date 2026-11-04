@@ -9,7 +9,7 @@ public class Main {
 	public static int MAX_HILOS = 10; // Cantidad de archivos que un hilo puede buscar por lote
 	
 	public static List<Directorio> recorrerDirectorios(File directorioRaiz) {
-		System.out.println("Raíz: " + directorioRaiz.getAbsolutePath());
+		//System.out.println("Raíz: " + directorioRaiz.getAbsolutePath());
 	    List<Directorio> directorios = new ArrayList<>();
 	    directorios.add(new Directorio(directorioRaiz));
 
@@ -19,7 +19,7 @@ public class Main {
 
 	    for (File f : elementos) {
 	        if (f.isDirectory()) {
-	        	System.out.println("Encontrada: " + f.getAbsolutePath());
+	        	//System.out.println("Nodos: " + f.getAbsolutePath());
 	            directorios.addAll(recorrerDirectorios(f));
 	        }
 	    }
