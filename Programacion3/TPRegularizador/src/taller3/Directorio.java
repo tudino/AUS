@@ -1,4 +1,4 @@
-package application;
+package taller3;
 
 import java.io.File;
 
@@ -23,5 +23,9 @@ public class Directorio {
 
 	public void setCursor(int cursor) {
 		this.cursor = cursor;
+	}
+	
+	public int getCantidadTotalDeArchivos() {
+		return this.file.listFiles().length;
 	}
 }
