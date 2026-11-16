@@ -19,3 +19,9 @@ Se muestran todas las coincidencias encontradas, indicando para cada una:
 - Nombre del hilo que encontró el archivo.
 
 
+
+## Utilidad generar_directorio.py para test
+
+El script `generar_directorio.py` crea una estructura de archivos aleatoria con multiples carpetas y archivos para poder testear el programa.
+Crea el directorio raiz `testdis` y multiples archivos `archivo.txt` en diferentes subdirectorios.
+
