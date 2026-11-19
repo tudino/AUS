@@ -3,23 +3,24 @@ package policom.protocol;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import policom.exceptions.ProtocolException;
 
 public class Message {
 
     private static final int MAX_MESSAGE_SIZE = 1024 * 1024;
 
-    private final MessageType type;
+    private final MessageType msgType;
     private final String requestId;
     private final String payload;
 
-    public Message(MessageType type, String requestId, String payload) {
-        this.type = type;
+    public Message(MessageType mtype, String requestId, String payload) {
+        this.msgType = mtype;
         this.requestId = requestId;
         this.payload = payload;
     }
 
     public MessageType getType() {
-        return type;
+        return msgType;
     }
 
     public String getRequestId() {
@@ -34,7 +35,7 @@ public class Message {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         DataOutputStream data = new DataOutputStream(buffer);
 
-        writeString(data, type.name());
+        writeString(data, msgType.name());
         writeString(data, requestId);
         writeString(data, payload);
 
@@ -43,7 +44,7 @@ public class Message {
         byte[] bytes = buffer.toByteArray();
 
         if (bytes.length > MAX_MESSAGE_SIZE) {
-            throw new IOException("Message too large");
+            throw new ProtocolException("Message too large");
         }
 
         out.writeInt(bytes.length);
@@ -55,7 +56,7 @@ public class Message {
         int length = in.readInt();
 
         if (length <= 0 || length > MAX_MESSAGE_SIZE) {
-            throw new IOException("Invalid message length");
+            throw new ProtocolException("Invalid message length");
         }
 
         byte[] bytes = new byte[length];
@@ -64,18 +65,18 @@ public class Message {
         DataInputStream data = new DataInputStream(new ByteArrayInputStream(bytes));
 
         try {
-            MessageType type = MessageType.valueOf(readString(data));
+            MessageType mtype = MessageType.valueOf(readString(data));
             String requestId = readString(data);
             String payload = readString(data);
 
             if (data.available() != 0) {
-                throw new IOException("Unexpected message data");
+                throw new ProtocolException("Unexpected message data");
             }
 
-            return new Message(type, requestId, payload);
+            return new Message(mtype, requestId, payload);
 
         } catch (IllegalArgumentException | NullPointerException e) {
-            throw new IOException("Invalid message format", e);
+            throw new ProtocolException("Invalid message format", e);
         }
     }
 
@@ -99,7 +100,7 @@ public class Message {
         }
 
         if (length < 0 || length > in.available()) {
-            throw new IOException("Invalid string length");
+            throw new ProtocolException("Invalid string length");
         }
 
         byte[] bytes = new byte[length];
@@ -134,7 +135,7 @@ public class Message {
 
     public static String[] decodePayload(String payload, int fieldCount) throws IOException {
         if (payload == null) {
-            throw new IOException("Missing payload");
+            throw new ProtocolException("Missing payload");
         }
 
         byte[] bytes = Base64.getDecoder().decode(payload);
@@ -152,7 +153,7 @@ public class Message {
             }
 
             if (length < 0 || length > input.available()) {
-                throw new IOException("Invalid payload field length");
+                throw new ProtocolException("Invalid payload field length");
             }
 
             byte[] field = new byte[length];
@@ -162,7 +163,7 @@ public class Message {
         }
 
         if (input.available() != 0) {
-            throw new IOException("Unexpected payload data");
+            throw new ProtocolException("Unexpected payload data");
         }
 
         return values;

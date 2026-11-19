@@ -5,8 +5,8 @@ public class KeyValueRequest extends Request {
     private final String key;
     private final String value;
 
-    public KeyValueRequest(String requestId, MessageType type, String key, String value) {
-        super(requestId, type);
+    public KeyValueRequest(String requestId, MessageType mtype, String key, String value) {
+        super(requestId, mtype);
         this.key = key;
         this.value = value;
     }

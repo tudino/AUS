@@ -8,15 +8,16 @@ public enum MessageType {
     PUBLISH,
     SET,
     GET,
+    EXTEND_TTL,
 
     // Respuestas del servidor
     ACK,
-    RESPONSE,
+    OK,
     ERROR,
 
     // Control de conexión
-    HEARTBEAT,
-    HEARTBEAT_RESPONSE,
+    PING,
+    PONG,
 
     // Notificaciones
     NOTIFICATION

@@ -4,8 +4,8 @@ public class SubscriptionRequest extends Request {
 
     private final String topic;
 
-    public SubscriptionRequest(String requestId, MessageType type, String topic) {
-        super(requestId, type);
+    public SubscriptionRequest(String requestId, MessageType mtype, String topic) {
+        super(requestId, mtype);
         this.topic = topic;
     }
 

@@ -3,12 +3,17 @@ package policom.sdk;
 import java.io.IOException;
 
 import policom.broker.BrokerServer;
+import policom.config.ServerConfig;
 
 public class Server {
 
     private final BrokerServer brokerServer;
 
-    public Server(ServerConfig config) {
+    public Server(int port) throws IOException {
+        this.brokerServer = new BrokerServer(port);
+    }
+    
+    public Server(ServerConfig config) throws IOException {
         if (config == null) {
             throw new IllegalArgumentException("Config cannot be null");
         }

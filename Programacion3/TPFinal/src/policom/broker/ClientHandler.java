@@ -14,14 +14,14 @@ import policom.pubsub.Subscription;
 public class ClientHandler implements Runnable {
 
     private final Socket socket;
-    private final ConnectionManager connectionManager;
+    private final BrokerConnectionManager connectionManager;
     private final PubSubManager pubSubManager;
     private final KeyValueManager keyValueManager;
 
     private DataInputStream input;
     private DataOutputStream output;
 
-    public ClientHandler(Socket socket, ConnectionManager connectionManager, PubSubManager pubSubManager, KeyValueManager keyValueManager) {
+    public ClientHandler(Socket socket, BrokerConnectionManager connectionManager, PubSubManager pubSubManager, KeyValueManager keyValueManager) {
         this.socket = socket;
         this.connectionManager = connectionManager;
         this.pubSubManager = pubSubManager;
@@ -54,19 +54,19 @@ public class ClientHandler implements Runnable {
     private void processMessage(Message message) throws IOException {
         try {
             switch (message.getType()) {
-                case HEARTBEAT:
-                    sendResponse(MessageType.HEARTBEAT_RESPONSE, message.getRequestId(), null);
+                case PING:
+                    sendResponse(MessageType.PONG, message.getRequestId(), null);
                     break;
                 case SUBSCRIBE: {
                     String[] fields = Message.decodePayload(message.getPayload(), 1);
                     pubSubManager.subscribe(fields[0], this);
-                    sendResponse(MessageType.RESPONSE, message.getRequestId(), null);
+                    sendResponse(MessageType.OK, message.getRequestId(), null);
                     break;
                 }
                 case UNSUBSCRIBE: {
                     String[] fields = Message.decodePayload(message.getPayload(), 1);
                     pubSubManager.unsubscribe(fields[0], this);
-                    sendResponse(MessageType.RESPONSE, message.getRequestId(), null);
+                    sendResponse(MessageType.OK, message.getRequestId(), null);
                     break;
                 }
                 case PUBLISH: {
@@ -84,13 +84,19 @@ public class ClientHandler implements Runnable {
                 case SET: {
                     String[] fields = Message.decodePayload(message.getPayload(), 2);
                     keyValueManager.set(fields[0], fields[1]);
-                    sendResponse(MessageType.RESPONSE, message.getRequestId(), null);
+                    sendResponse(MessageType.OK, message.getRequestId(), null);
                     break;
                 }
                 case GET: {
                     String[] fields = Message.decodePayload(message.getPayload(), 1);
                     String value = keyValueManager.get(fields[0]);
-                    sendResponse(MessageType.RESPONSE, message.getRequestId(), Message.encodePayload(new String[] { value }));
+                    sendResponse(MessageType.OK, message.getRequestId(), Message.encodePayload(new String[] { value }));
+                    break;
+                }
+                case EXTEND_TTL: {
+                    String[] fields = Message.decodePayload(message.getPayload(), 1);
+                    keyValueManager.extendTTL(fields[0]);
+                    sendResponse(MessageType.OK, message.getRequestId(), null);
                     break;
                 }
                 default:

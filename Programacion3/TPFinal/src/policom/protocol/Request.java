@@ -3,11 +3,11 @@ package policom.protocol;
 public abstract class Request {
 
     private final String requestId;
-    private final MessageType type;
+    private final MessageType msgType;
 
-    protected Request(String requestId, MessageType type) {
+    protected Request(String requestId, MessageType mtype) {
         this.requestId = requestId;
-        this.type = type;
+        this.msgType = mtype;
     }
 
     public String getRequestId() {
@@ -15,6 +15,6 @@ public abstract class Request {
     }
 
     public MessageType getType() {
-        return type;
+        return msgType;
     }
 }

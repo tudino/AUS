@@ -54,10 +54,7 @@ public class ConnectionManager {
         receiver.start();
     }
 
-    public CompletableFuture<Message> sendRequest(
-            MessageType type,
-            String payload) throws IOException {
-
+    public CompletableFuture<Message> sendRequest(MessageType type, String payload) throws IOException {
         if (!connected) {
             throw new IOException("Client is disconnected");
         }

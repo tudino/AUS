@@ -1,9 +1,11 @@
+import java.io.IOException;
+
+import policom.config.ServerConfig;
 import policom.sdk.Server;
-import policom.sdk.ServerConfig;
 
 public class ServerMain {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Server server = new Server(new ServerConfig(5000));
 
         try {

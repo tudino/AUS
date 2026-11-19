@@ -3,11 +3,11 @@ package policom.broker;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ConnectionManager {
+public class BrokerConnectionManager {
 
     private final Set<ClientHandler> connections;
 
-    public ConnectionManager() {
+    public BrokerConnectionManager() {
         connections = ConcurrentHashMap.newKeySet();
     }
 

@@ -80,7 +80,7 @@ public class Subscriber {
             throw new IOException("Broker rejected the operation");
         }
 
-        if (response.getType() != MessageType.RESPONSE) {
+        if (response.getType() != MessageType.OK) {
             throw new IOException("Unexpected broker response");
         }
     }

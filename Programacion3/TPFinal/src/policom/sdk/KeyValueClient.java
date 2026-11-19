@@ -50,12 +50,30 @@ public class KeyValueClient {
         }
     }
 
+    public String extendTTL(String key) throws IOException {
+    	try {
+            Message response = connectionManager.sendRequest(
+                MessageType.EXTEND_TTL,
+                Message.encodePayload(new String[] { key })
+            ).get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+            checkResponse(response);
+
+            return Message.decodePayload(response.getPayload(), 1)[0];
+
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException("Could not get value", e);
+        }
+    }
+    
     private void checkResponse(Message response) throws IOException {
         if (response.getType() == MessageType.ERROR) {
             throw new IOException("Broker rejected the operation");
         }
 
-        if (response.getType() != MessageType.RESPONSE) {
+        if (response.getType() != MessageType.OK) {
             throw new IOException("Unexpected broker response");
         }
     }

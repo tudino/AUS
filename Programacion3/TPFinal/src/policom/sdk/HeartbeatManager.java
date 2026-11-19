@@ -41,11 +41,11 @@ public class HeartbeatManager {
 
         try {
             Message response = connectionManager.sendRequest(
-                MessageType.HEARTBEAT,
+                MessageType.PING,
                 null
             ).get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-            if (response.getType() != MessageType.HEARTBEAT_RESPONSE) {
+            if (response.getType() != MessageType.PONG) {
                 connectionManager.close();
             }
 

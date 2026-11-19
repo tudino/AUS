@@ -3,36 +3,67 @@ package policom.broker;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import policom.config.ServerConfig;
 import policom.keyvalue.KeyValueManager;
+import policom.persistence.PersistenceManager;
 import policom.pubsub.PubSubManager;
 
+/*
+ * Gestiona las conexiones de los clientes y coordina los módulos de Pub/Sub y Key-Value.
+ * Administra el ciclo de vida del broker y su configuración.
+ */
 public class BrokerServer {
 
-    private final int port;
-    private final ConnectionManager connectionManager;
+    private final ServerConfig serverConfig;
+    private final BrokerConnectionManager connectionManager;
     private final PubSubManager pubSubManager;
     private final KeyValueManager keyValueManager;
 
     private ServerSocket serverSocket;
     private volatile boolean running;
 
-    public BrokerServer(int port) {
-        this.port = port;
-        this.connectionManager = new ConnectionManager();
+    public BrokerServer(int port) throws IOException {
+    	ServerConfig svConf = new ServerConfig(port);
+    	this(svConf);
+    }
+    
+    public BrokerServer(ServerConfig serverConfig) throws IOException {
+        this.serverConfig = serverConfig;
+        this.connectionManager = new BrokerConnectionManager();
         this.pubSubManager = new PubSubManager();
-        this.keyValueManager = new KeyValueManager();
+        PersistenceManager persistenceManager = null;
+        
+        if (serverConfig.isPersistenceEnabled()) {
+        	if (serverConfig.getPersistencePath() == null) {
+            	Path persistencePath = Paths.get(System.getProperty("user.home"), ".policom", "server-" + serverConfig.getPort());
+            	serverConfig.setPersistencePath(persistencePath);
+            }
+        	
+            persistenceManager = new PersistenceManager(serverConfig.getPersistencePath());
+        }
+
+        this.keyValueManager = new KeyValueManager(persistenceManager, serverConfig.getKeyValueTTL());
     }
 
+    public boolean isRunning() {
+        return running;
+    }
+
+    /*
+     * Bucle de espera de solicitudes, por cada conexion lanza un nuevo hilo 
+     */
     public void start() throws IOException {
         if (running) {
             throw new IllegalStateException("Server already running");
         }
 
-        serverSocket = new ServerSocket(port);
+        serverSocket = new ServerSocket(serverConfig.getPort());
         running = true;
 
-        System.out.println("Broker started on port " + port);
+        System.out.println("Broker started on port " + serverConfig.getPort());
 
         try {
             while (running) {
@@ -64,6 +95,10 @@ public class BrokerServer {
         }
     }
 
+    /*
+     * Frena y cierra el server socket
+     * Cierra todos los socket de clientes
+     */
     public synchronized void stop() {
         running = false;
 
@@ -79,9 +114,5 @@ public class BrokerServer {
         connectionManager.closeAll();
 
         System.out.println("Broker stopped");
-    }
-
-    public boolean isRunning() {
-        return running;
     }
 }
