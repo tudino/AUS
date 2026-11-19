@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import policom.config.ServerConfig;
 import policom.keyvalue.KeyValueManager;
@@ -16,9 +18,9 @@ import policom.pubsub.PubSubManager;
  * Administra el ciclo de vida del broker y su configuración.
  */
 public class BrokerServer {
-
+	
+	private final Set<ClientHandler> clientHandlers;
     private final ServerConfig serverConfig;
-    private final BrokerConnectionManager connectionManager;
     private final PubSubManager pubSubManager;
     private final KeyValueManager keyValueManager;
 
@@ -32,7 +34,7 @@ public class BrokerServer {
     
     public BrokerServer(ServerConfig serverConfig) throws IOException {
         this.serverConfig = serverConfig;
-        this.connectionManager = new BrokerConnectionManager();
+        this.clientHandlers = ConcurrentHashMap.newKeySet();
         this.pubSubManager = new PubSubManager();
         PersistenceManager persistenceManager = null;
         
@@ -50,6 +52,10 @@ public class BrokerServer {
 
     public boolean isRunning() {
         return running;
+    }
+    
+    public int getConnectionCount() {
+        return clientHandlers.size();
     }
 
     /*
@@ -71,18 +77,15 @@ public class BrokerServer {
 
                 ClientHandler handler = new ClientHandler(
                     clientSocket,
-                    connectionManager,
+                    this::removeClientHandler,
                     pubSubManager,
                     keyValueManager
                 );
 
-                connectionManager.add(handler);
-
-                Thread thread = new Thread(
-                    handler,
-                    "Client-" + clientSocket.getPort()
-                );
-
+                clientHandlers.add(handler);
+                
+                String thname = "Client-" + clientSocket.getPort();
+                Thread thread = new Thread(handler, thname);
                 thread.start();
             }
 
@@ -93,6 +96,13 @@ public class BrokerServer {
         } finally {
             stop();
         }
+    }
+
+    /*
+     * Elimina un cliente del set de conexiones
+     */
+    private void removeClientHandler(ClientHandler handler) {
+        clientHandlers.remove(handler);
     }
 
     /*
@@ -111,8 +121,18 @@ public class BrokerServer {
             e.printStackTrace();
         }
 
-        connectionManager.closeAll();
+        closeAll();
 
         System.out.println("Broker stopped");
+    }
+
+    /*
+     * Cierra todos los handlers activos
+     */
+    public void closeAll() {
+        for (ClientHandler handler : clientHandlers) {
+            handler.close();
+        }
+        clientHandlers.clear();
     }
 }

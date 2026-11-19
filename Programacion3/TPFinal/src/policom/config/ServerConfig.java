@@ -2,6 +2,9 @@ package policom.config;
 
 import java.nio.file.Path;
 
+/*
+ * Configuracion del server
+ */
 public class ServerConfig {
 
     private static final int DEFAULT_PORT = 5000;

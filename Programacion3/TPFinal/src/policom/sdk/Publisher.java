@@ -6,6 +6,11 @@ import java.util.concurrent.TimeUnit;
 import policom.protocol.Message;
 import policom.protocol.MessageType;
 
+/*
+ * Proporciona la funcionalidad de publicación de mensajes via pub/sub.
+ * Permite enviar mensajes a un tópico determinado para luego ser distribuidos
+ * por el servidor a los clientes suscriptos.
+ */
 public class Publisher {
 
     private static final int TIMEOUT_SECONDS = 5;

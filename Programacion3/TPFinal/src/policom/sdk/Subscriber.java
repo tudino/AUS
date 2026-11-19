@@ -9,6 +9,11 @@ import java.util.function.Consumer;
 import policom.protocol.Message;
 import policom.protocol.MessageType;
 
+/*
+ * Proporciona la funcionalidad de suscripción a los diferentes topicos.
+ * Permite registrar y cancelar suscripciones, asi como recibir los
+ * envios correspondientes a los mensajes publicados.
+ */
 public class Subscriber {
 
     private static final int TIMEOUT_SECONDS = 5;
@@ -22,9 +27,7 @@ public class Subscriber {
         this.subscriptions = new ConcurrentHashMap<>();
     }
 
-    public void subscribe(String topic, Consumer<String> listener)
-            throws IOException {
-
+    public void subscribe(String topic, Consumer<String> listener) throws IOException {
         if (topic == null || topic.isEmpty() || listener == null) {
             throw new IllegalArgumentException("Invalid subscription");
         }
@@ -60,7 +63,7 @@ public class Subscriber {
         }
     }
 
-    void notify(Message message) {
+    void notify(Message message) throws IOException {
         try {
             String[] fields = Message.decodePayload(message.getPayload(), 2);
 
@@ -70,8 +73,8 @@ public class Subscriber {
                 listener.accept(fields[1]);
             }
 
-        } catch (IOException | RuntimeException e) {
-            // Invalid notification or listener failure.
+        } catch (IOException e) {
+        	throw new IOException("Invalid notification or listener failure.");
         }
     }
 

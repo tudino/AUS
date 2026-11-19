@@ -1,4 +1,4 @@
-package policom.exceptions;
+package policom.protocol;
 
 import java.io.IOException;
 

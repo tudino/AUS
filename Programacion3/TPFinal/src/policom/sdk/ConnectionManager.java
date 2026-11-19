@@ -13,6 +13,11 @@ import java.util.function.Consumer;
 import policom.protocol.Message;
 import policom.protocol.MessageType;
 
+/*
+ * Gestiona la conexión TCP entre el cliente y el servidor utilizando Socket.
+ * Coordina el envío y la recepción de mensajes, la identificación
+ * de solicitudes y la distribución de respuestas y mensajes de topicos suscriptos.
+ */
 public class ConnectionManager {
 
     private final String host;
@@ -25,7 +30,7 @@ public class ConnectionManager {
     private volatile DataOutputStream output;
     private volatile boolean connected;
 
-    private Consumer<Message> notificationListener;
+    private Consumer<Message> subscriptionEventListener;
 
     public ConnectionManager(String host, int port) {
         this.host = host;
@@ -45,10 +50,7 @@ public class ConnectionManager {
         output = new DataOutputStream(newSocket.getOutputStream());
         connected = true;
 
-        Thread receiver = new Thread(
-            this::receiveMessages,
-            "PoliCOM-Receiver"
-        );
+        Thread receiver = new Thread(this::receiveMessages, "PoliCOM-Receiver");
 
         receiver.setDaemon(true);
         receiver.start();
@@ -88,8 +90,8 @@ public class ConnectionManager {
             while (connected) {
                 Message message = Message.read(input);
 
-                if (message.getType() == MessageType.NOTIFICATION) {
-                    Consumer<Message> listener = notificationListener;
+                if (message.getType() == MessageType.SUBSCRIPTION_EVENT) {
+                    Consumer<Message> listener = subscriptionEventListener;
 
                     if (listener != null) {
                         listener.accept(message);
@@ -98,8 +100,7 @@ public class ConnectionManager {
                     continue;
                 }
 
-                CompletableFuture<Message> future =
-                    pendingRequests.remove(message.getRequestId());
+                CompletableFuture<Message> future = pendingRequests.remove(message.getRequestId());
 
                 if (future != null) {
                     future.complete(message);
@@ -110,8 +111,8 @@ public class ConnectionManager {
         }
     }
 
-    public void setNotificationListener(Consumer<Message> listener) {
-        this.notificationListener = listener;
+    public void setSubscriptionEventListener(Consumer<Message> listener) {
+        this.subscriptionEventListener = listener;
     }
 
     public boolean isConnected() {

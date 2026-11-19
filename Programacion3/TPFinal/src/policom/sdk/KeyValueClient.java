@@ -6,6 +6,11 @@ import java.util.concurrent.TimeUnit;
 import policom.protocol.Message;
 import policom.protocol.MessageType;
 
+/*
+ * Proporciona acceso al servicio de almacenamiento clave-valor.
+ * Permite almacenar y recuperar los valores mediante solicitudes enviadas al servidor.
+ * Tambien permite renovar el tiempo de vida de los valores.
+ */
 public class KeyValueClient {
 
     private static final int TIMEOUT_SECONDS = 5;
@@ -70,11 +75,11 @@ public class KeyValueClient {
     
     private void checkResponse(Message response) throws IOException {
         if (response.getType() == MessageType.ERROR) {
-            throw new IOException("Broker rejected the operation");
+            throw new IOException("Broker rejected the operation: " + response.getPayload());
         }
 
         if (response.getType() != MessageType.OK) {
-            throw new IOException("Unexpected broker response");
+            throw new IOException("Unexpected broker response " + response.getPayload());
         }
     }
 }

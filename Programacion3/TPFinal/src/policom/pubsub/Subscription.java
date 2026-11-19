@@ -2,6 +2,9 @@ package policom.pubsub;
 
 import policom.broker.ClientHandler;
 
+/*
+ * Entidad que representa una suscripcion, indicando topico y cliente
+ */
 public class Subscription {
 
     private final String topic;
@@ -16,7 +19,7 @@ public class Subscription {
         return topic;
     }
 
-    public ClientHandler getClientHandler() {
+    public ClientHandler getBrokerClientHandler() {
         return clientHandler;
     }
 }

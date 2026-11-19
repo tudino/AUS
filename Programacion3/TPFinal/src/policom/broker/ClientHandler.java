@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.function.Consumer;
 
 import policom.keyvalue.KeyValueManager;
 import policom.protocol.Message;
@@ -11,19 +12,23 @@ import policom.protocol.MessageType;
 import policom.pubsub.PubSubManager;
 import policom.pubsub.Subscription;
 
+/*
+ * Manejador de conexiones
+ * Recibe las peticiones, procesa el mensaje y envia las respuestas
+ */
 public class ClientHandler implements Runnable {
 
     private final Socket socket;
-    private final BrokerConnectionManager connectionManager;
+    private final Consumer<ClientHandler> onClose;
     private final PubSubManager pubSubManager;
     private final KeyValueManager keyValueManager;
 
     private DataInputStream input;
     private DataOutputStream output;
 
-    public ClientHandler(Socket socket, BrokerConnectionManager connectionManager, PubSubManager pubSubManager, KeyValueManager keyValueManager) {
+    public ClientHandler(Socket socket, Consumer<ClientHandler> onClose, PubSubManager pubSubManager, KeyValueManager keyValueManager) {
         this.socket = socket;
-        this.connectionManager = connectionManager;
+        this.onClose = onClose;
         this.pubSubManager = pubSubManager;
         this.keyValueManager = keyValueManager;
     }
@@ -47,7 +52,7 @@ public class ClientHandler implements Runnable {
         } finally {
             pubSubManager.removeClient(this);
             close();
-            connectionManager.remove(this);
+            onClose.accept(this);
         }
     }
 
@@ -74,8 +79,8 @@ public class ClientHandler implements Runnable {
                     String topic = fields[0];
                     String content = fields[1];
 
-                    for (Subscription subscription : pubSubManager.publish(topic)) {
-                        subscription.getClientHandler().sendNotification(topic, content);
+                    for (Subscription subscription : pubSubManager.getSubscriptions(topic)) {
+                        subscription.getBrokerClientHandler().sendToSubscribedClient(topic, content);
                     }
 
                     sendResponse(MessageType.ACK, message.getRequestId(), null);
@@ -111,10 +116,10 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private void sendNotification(String topic, String content) throws IOException {
-        Message notification = new Message(MessageType.NOTIFICATION, null, Message.encodePayload(new String[] { topic, content }));
+    private void sendToSubscribedClient(String topic, String content) throws IOException {
+        Message response = new Message(MessageType.SUBSCRIPTION_EVENT, null, Message.encodePayload(new String[] { topic, content }));
         synchronized (this) {
-            notification.write(output);
+        	response.write(output);
         }
     }
 
@@ -132,7 +137,10 @@ public class ClientHandler implements Runnable {
     public void close() {
         try {
             socket.close();
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+        	// ignored
+        } finally {
+        	// ignored
         }
     }
 }

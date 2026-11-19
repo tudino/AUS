@@ -3,8 +3,13 @@ package policom.protocol;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import policom.exceptions.ProtocolException;
 
+/*
+ * Representa un mensaje del protocolo de comunicación de PoliCOM.
+ * Contiene el tipo de mensaje, un identificador de solicitud y un payload.
+ * Se encarga de serializar y deserializar los mensajes para su transmisión
+ * entre clientes y servidor a través de una conexión TCP.
+ */
 public class Message {
 
     private static final int MAX_MESSAGE_SIZE = 1024 * 1024;
@@ -31,6 +36,9 @@ public class Message {
         return payload;
     }
 
+    /*
+     * Serializa el mensaje y lo escribe en el flujo de salida.
+     */
     public void write(DataOutputStream out) throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         DataOutputStream data = new DataOutputStream(buffer);
@@ -52,6 +60,9 @@ public class Message {
         out.flush();
     }
 
+    /*
+     * Lee y reconstruye un mensaje desde el flujo de entrada.
+     */
     public static Message read(DataInputStream in) throws IOException {
         int length = in.readInt();
 
@@ -80,6 +91,9 @@ public class Message {
         }
     }
 
+    /*
+     * Escribe una cadena en el flujo de salida, precedida por su longitud.
+     */
     private static void writeString(DataOutputStream out, String value) throws IOException {
         if (value == null) {
             out.writeInt(-1);
@@ -92,6 +106,9 @@ public class Message {
         out.write(bytes);
     }
 
+    /*
+     * Lee una cadena desde el flujo de entrada utilizando la longitud indicada.
+     */
     private static String readString(DataInputStream in) throws IOException {
         int length = in.readInt();
 
@@ -109,6 +126,9 @@ public class Message {
         return new String(bytes, StandardCharsets.UTF_8);
     }
     
+    /*
+     * Codifica un arreglo de cadenas en un único payload.
+     */
     public static String encodePayload(String[] values) {
         try {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -133,6 +153,9 @@ public class Message {
         }
     }
 
+    /*
+     * Decodifica un payload en un arreglo de cadenas según la cantidad de campos esperada.
+     */
     public static String[] decodePayload(String payload, int fieldCount) throws IOException {
         if (payload == null) {
             throw new ProtocolException("Missing payload");

@@ -1,37 +1,49 @@
+
 package policom.sdk;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
 
 import policom.protocol.Message;
 import policom.protocol.MessageType;
 
+/*
+ * Gestiona el envío periódico de mensajes Heartbeat para verificar
+ * que la conexión con el servidor permanece activa.
+ * Si detecta un fallo de comunicación, cierra la conexión.
+ */
 public class HeartbeatManager {
 
     private static final int INTERVAL_SECONDS = 10;
     private static final int TIMEOUT_SECONDS = 5;
 
     private final ConnectionManager connectionManager;
-    private ScheduledExecutorService scheduler;
+    private Thread heartbeatThread;
 
     public HeartbeatManager(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
 
     public synchronized void start() {
-        if (scheduler != null && !scheduler.isShutdown()) {
+        if (heartbeatThread != null && heartbeatThread.isAlive()) {
             return;
         }
 
-        scheduler = Executors.newSingleThreadScheduledExecutor();
+        heartbeatThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+            	while (!Thread.currentThread().isInterrupted()) {
+            		try {
+            			Thread.sleep(INTERVAL_SECONDS * 1000);
+            			sendHeartbeat();
+            		} catch (InterruptedException e) {
+            			Thread.currentThread().interrupt();
+            		}
+            	}
+            }
+        });
 
-        scheduler.scheduleAtFixedRate(
-            this::sendHeartbeat,
-            INTERVAL_SECONDS,
-            INTERVAL_SECONDS,
-            TimeUnit.SECONDS
-        );
+        heartbeatThread.setDaemon(true);
+        heartbeatThread.start();
     }
 
     private void sendHeartbeat() {
@@ -40,10 +52,8 @@ public class HeartbeatManager {
         }
 
         try {
-            Message response = connectionManager.sendRequest(
-                MessageType.PING,
-                null
-            ).get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        	CompletableFuture<Message> future = connectionManager.sendRequest(MessageType.PING, null);
+            Message response = future.get(TIMEOUT_SECONDS, java.util.concurrent.TimeUnit.SECONDS);
 
             if (response.getType() != MessageType.PONG) {
                 connectionManager.close();
@@ -55,9 +65,9 @@ public class HeartbeatManager {
     }
 
     public synchronized void stop() {
-        if (scheduler != null) {
-            scheduler.shutdownNow();
-            scheduler = null;
+        if (heartbeatThread != null) {
+            heartbeatThread.interrupt();
+            heartbeatThread = null;
         }
     }
 }

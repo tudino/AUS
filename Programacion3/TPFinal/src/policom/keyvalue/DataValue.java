@@ -3,6 +3,10 @@ package policom.keyvalue;
 import java.io.Serializable;
 import java.time.Instant;
 
+/*
+ * Entidad que envuelve a un Valor del modulo KeyValue, especificando
+ * la fecha de expiracion y ultima modificacion.
+ */
 public class DataValue implements Serializable {
 
     private static final long serialVersionUID = 1L;

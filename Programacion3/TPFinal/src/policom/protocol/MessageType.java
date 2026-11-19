@@ -1,5 +1,8 @@
 package policom.protocol;
 
+/*
+ * Tipos de mensajes transmitidos entre cliente-servidor
+ */
 public enum MessageType {
 
     // Solicitudes del cliente
@@ -19,6 +22,6 @@ public enum MessageType {
     PING,
     PONG,
 
-    // Notificaciones
-    NOTIFICATION
+    // Recepcion de mensajes en un canal suscrito
+    SUBSCRIPTION_EVENT
 }

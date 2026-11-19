@@ -7,6 +7,10 @@ import java.util.concurrent.ConcurrentMap;
 
 import policom.broker.ClientHandler;
 
+/*
+ * Entidad que establece una relacion entre el nombre de un topico y su tabla de suscripciones.
+ * Este recurso permite rutear las publicaciones en un topico a todos sus suscriptores.
+ */
 public class Topic {
 
     private final String name;

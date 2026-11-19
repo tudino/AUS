@@ -5,6 +5,11 @@ import java.io.IOException;
 import policom.broker.BrokerServer;
 import policom.config.ServerConfig;
 
+/*
+ * Representa el servidor de PoliCOM y proporciona una interfaz para su puesta en marcha.
+ * Permite configurar, iniciar y detener el servidor que ofrece los servicios
+ * de publicación/suscripción y almacenamiento clave-valor.
+ */
 public class Server {
 
     private final BrokerServer brokerServer;

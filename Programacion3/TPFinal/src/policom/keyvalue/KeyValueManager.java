@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentMap;
 import policom.persistence.PersistenceManager;
 
 /*
- * Gestor del almacenamiento Clave-Valor en memoria y de forma persistente.
+ * Gestor del almacenamiento Clave-Valor.
  * Requiere PersistenceManager en caso de utilizar el modulo de persistencia.
  * Al invocar el constructor se cargan los datos persistentes en memoria y eliminan los elementos expirados
  */
@@ -18,6 +18,7 @@ public class KeyValueManager {
 
     private static final int MAX_KEY_LENGTH = 32;
     private static final int MAX_VALUE_LENGTH = 256;
+    private static final String VALID_KEY_REGEXP = "[a-zA-Z0-9_-]{1,"+MAX_KEY_LENGTH+"}";
 
     private final ConcurrentMap<String, DataValue> storage;
     private final PersistenceManager persistenceManager;
@@ -126,8 +127,8 @@ public class KeyValueManager {
     }
 
     private void validateKey(String key) {
-        if (key == null || key.isEmpty() || !key.matches("[a-zA-Z0-9_-]")) {
-            throw new IllegalArgumentException("Key cannot be null or empty");
+        if (key == null || key.isEmpty() || !key.matches(VALID_KEY_REGEXP)) {
+            throw new IllegalArgumentException("Key cannot be null, empty or contain special characters");
         }
 
         if (key.length() > MAX_KEY_LENGTH) {

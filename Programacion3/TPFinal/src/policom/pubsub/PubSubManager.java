@@ -7,6 +7,9 @@ import java.util.concurrent.ConcurrentMap;
 
 import policom.broker.ClientHandler;
 
+/*
+ * Gestiona la suscripcion de un cliente a los distintos topicos
+ */
 public class PubSubManager {
 
     private final ConcurrentMap<String, Topic> topics;
@@ -37,7 +40,7 @@ public class PubSubManager {
         });
     }
 
-    public Set<Subscription> publish(String topicName) {
+    public Set<Subscription> getSubscriptions(String topicName) {
         validateTopic(topicName);
 
         Topic topic = topics.get(topicName);

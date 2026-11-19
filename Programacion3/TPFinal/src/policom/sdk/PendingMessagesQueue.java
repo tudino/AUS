@@ -3,8 +3,30 @@ package policom.sdk;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+/*
+ * Cola interna de mensajes pendientes del lado del cliente.
+ * Utiliza los metodos no bloqueantes offer() y poll()
+ */
 public class PendingMessagesQueue {
+	
+	public static class PendingMessage {
+        private final String topic;
+        private final String message;
 
+        public PendingMessage(String topic, String message) {
+            this.topic = topic;
+            this.message = message;
+        }
+
+        public String getTopic() {
+            return topic;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
+	
     private final BlockingQueue<PendingMessage> queue;
 
     public PendingMessagesQueue(int capacity) {
@@ -31,23 +53,5 @@ public class PendingMessagesQueue {
 
     public int size() {
         return queue.size();
-    }
-
-    public static class PendingMessage {
-        private final String topic;
-        private final String message;
-
-        public PendingMessage(String topic, String message) {
-            this.topic = topic;
-            this.message = message;
-        }
-
-        public String getTopic() {
-            return topic;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-    }
+    }    
 }

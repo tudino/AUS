@@ -154,7 +154,7 @@ public class PersistenceManager {
     }
 
     /*
-     * Obtiene un Map con todas las entradas Clave-DataValue del directorio de persistencia
+     * Carga todos las entradas del directorio en memoria
      */
     public synchronized Map<String, DataValue> loadAll() throws IOException {
         Map<String, DataValue> data = new HashMap<>();
@@ -181,7 +181,7 @@ public class PersistenceManager {
     }
 
     /*
-     * Elimina un archivo usando su Clave
+     * Elimina un archivo por su Clave
      */
     public synchronized void delete(String key) throws IOException {
         validateKey(key);
@@ -200,10 +200,10 @@ public class PersistenceManager {
     }
 
     /*
-     * Valida que una Clave no sea null y no contenga caracteres especiales y longitud delimitada
+     * Valida que una Clave no sea null y ni este vacia
      */
     private void validateKey(String key) {
-        if (key == null || key.isEmpty() || !key.matches("[a-zA-Z0-9_-]{1,32}")) {
+        if (key == null || key.isEmpty()) {
             throw new IllegalArgumentException("Invalid key");
         }
     }
