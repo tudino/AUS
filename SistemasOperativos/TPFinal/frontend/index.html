@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biblioteca de Libros</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-100 text-gray-800">
+
+  <header class="bg-blue-700 text-white py-4 px-6 shadow">
+    <h1 class="text-2xl font-bold">Biblioteca de Libros</h1>
+  </header>
+
+  <main class="flex flex-col md:flex-row h-[calc(100vh-64px)]">
+
+    <!-- Panel izquierdo: búsqueda + listado -->
+    <section class="w-full md:w-1/2 border-r border-gray-300 flex flex-col p-4">
+      <div class="relative mb-4">
+        <input
+          id="search"
+          type="text"
+          placeholder="Buscar por título o editorial"
+          class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          id="clear-search"
+          type="button"
+          title="Limpiar búsqueda"
+          class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-red-600 text-xl px-1"
+        >✕</button>
+      </div>
+
+      <ul id="book-list" class="flex-1 overflow-y-auto space-y-2"></ul>
+    </section>
+
+    <!-- Panel derecho: formulario -->
+    <section class="w-full md:w-1/2 p-4 overflow-y-auto">
+      <form id="book-form" class="bg-white shadow rounded-lg p-6 space-y-4" novalidate>
+        <div>
+          <label for="id" class="block text-sm font-medium mb-1">ID</label>
+          <input id="id" type="text"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <div>
+          <label for="titulo" class="block text-sm font-medium mb-1">Título</label>
+          <input id="titulo" type="text"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <div>
+          <label for="cantidad_paginas" class="block text-sm font-medium mb-1">Cantidad de páginas</label>
+          <input id="cantidad_paginas" type="number" min="1" step="1"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <div>
+          <label for="editorial" class="block text-sm font-medium mb-1">Editorial</label>
+          <input id="editorial" type="text"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <div>
+          <label for="isbn" class="block text-sm font-medium mb-1">ISBN</label>
+          <input id="isbn" type="text"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <div>
+          <label for="costo" class="block text-sm font-medium mb-1">Costo</label>
+          <input id="costo" type="number" min="0" step="0.01"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <p id="form-error" class="hidden text-red-600 text-sm font-medium"></p>
+
+        <div class="flex gap-3 pt-2">
+          <button id="clear-form" type="button"
+            class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md font-medium">Limpiar</button>
+          <button id="add" type="submit"
+            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md font-medium">Agregar</button>
+          <button id="modify" type="button"
+            class="hidden px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium">Modificar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
